@@ -14,7 +14,7 @@
   background-size: cover;
   background-position: center;
   transition: background-image 1s ease-in-out;
-  /* opacity: 0.8; */
+  opacity: 0.4;
   z-index: -1;
 }
 
@@ -22,7 +22,6 @@
   position: relative;
   z-index: 1;
   color: white;
-  text-align: center;
 }
 
 h1, p {

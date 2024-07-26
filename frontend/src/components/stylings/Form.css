@@ -1,12 +1,12 @@
 .form-container {
-    background-color: #1a1a1a; /* Dark background color */
+    background-color: #1a1a1a;
     padding: 50px;
     border-radius: 20px;
-    width: 800px;
-    height: 400px;
+    width: 700px;
+    height: 200px;
     margin: 0 auto;
     color: #ffffff;
-    margin-top: 160px;
+    margin-top: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -49,6 +49,10 @@
     font-weight: 500;
     cursor: pointer;
     font-family: "Rubik", sans-serif;
+  }
+
+  .submit-btn {
+    margin-bottom: 10px;
   }
   
   button:hover {

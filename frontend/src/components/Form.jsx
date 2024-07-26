@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import './stylings/Form.css';
+import { useNavigate } from "react-router-dom";
 
 const Form = () => {
   const [flightNumber, setFlightNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ flightNumber, email, phoneNumber });
+    console.log({ flightNumber });
+    navigate(`/flight-details/${flightNumber}`, { replace: true });
   };
 
   return (
@@ -26,25 +28,8 @@ const Form = () => {
             required
           />
         </div>
-        <div className='input-class'>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className='input-class'>
-          <label htmlFor="phoneNumber">Phone Number</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        </div>
-        <button type="submit">Submit</button>
+
+        <button type="submit">Get Flight Details</button>
       </form>
     </div>
   );
