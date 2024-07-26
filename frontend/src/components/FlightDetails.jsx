@@ -7,6 +7,7 @@ import leftArrow from "../assets/left-arrow.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {flight_details_uri, add_user_uri} from "../const";
 
 const FlightDetails = () => {
   const { flightNumber } = useParams();
@@ -19,7 +20,7 @@ const FlightDetails = () => {
   const [errorMessage, setErrorMessage] = useState(false);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/get_flight_details/${flightNumber}`)
+    fetch(`${flight_details_uri}/${flightNumber}`)
       .then((response) => response.json())
       .then((data) => setFlightData(data))
       .catch((error) => console.error("Error fetching flight data:", error));
@@ -94,7 +95,7 @@ const FlightDetails = () => {
 
     const user = { email, phone_number: phoneNumber, fln: flightNumber };
 
-    const response = await fetch("http://127.0.0.1:8000/add_user", {
+    const response = await fetch(add_user_uri, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

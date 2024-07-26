@@ -1,6 +1,7 @@
 from pymongo import MongoClient
+from credentials import mongodb_uri
 
-client = MongoClient("mongodb+srv://hack-to-hire:hack-to-hire@maincluster.vaweana.mongodb.net/?retryWrites=true&w=majority&appName=MainCluster")
+client = MongoClient(mongodb_uri)
 
 db = client.hack_to_hire
 collection = db.users

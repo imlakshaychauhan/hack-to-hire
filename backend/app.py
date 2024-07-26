@@ -3,14 +3,15 @@ from flask_socketio import SocketIO
 from db import add_user_to_database
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -23,8 +24,9 @@ def add_user():
         return jsonify({"error": "Flight number and either email or phone number are required", "is_user_added": False}), 400
 
     response = add_user_to_database(fln, email, phone_number)
-    
+
     return jsonify({"message": "User added successfully", "id": str(response.inserted_id), "is_user_added": True}), 201
+
 
 @app.route('/get_flight_details/<flight_number>', methods=['GET'])
 def get_details(flight_number):
@@ -69,6 +71,7 @@ def get_details(flight_number):
         }
     ]
     return jsonify(flight_data)
+
 
 if __name__ == '__main__':
     socketio.run(app, port=8000)

@@ -9,7 +9,6 @@ const Form = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ flightNumber });
     navigate(`/flight-details/${flightNumber}`, { replace: true });
   };
 
