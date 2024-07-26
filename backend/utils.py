@@ -2,7 +2,7 @@ import requests
 import smtplib
 from email.mime.text import MIMEText
 from twilio.rest import Client
-from credentials import x_rapidapi_host, x_rapidapi_key, account_sid, auth_token, twilio_phone_number
+from credentials import x_rapidapi_host, x_rapidapi_key, account_sid, auth_token, twilio_phone_number, google_app_password, google_email
 
 
 def getFlightInfo(flight_number):
@@ -22,13 +22,12 @@ def getFlightInfo(flight_number):
 def send_email(to_email, subject, message):
     msg = MIMEText(message)
     msg['Subject'] = subject
-    msg['From'] = "chauhanhoney2001@gmail.com"
+    msg['From'] = google_email
     msg['To'] = to_email
 
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.login("chauhanhoney2001@gmail.com", "pqrs ftxq padk kflj")
-        server.sendmail("chauhanhoney2001@gmail.com",
-                        to_email, msg.as_string())
+        server.login(google_email, google_app_password)
+        server.sendmail(google_email, to_email, msg.as_string())
 
 
 def send_sms(to, body):
