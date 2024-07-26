@@ -92,8 +92,11 @@ const FlightDetails = () => {
 
   const addUserToDb = async (e) => {
     e.preventDefault();
-
-    const user = { email, phone_number: phoneNumber, fln: flightNumber };
+    let user = {}
+    if(currentNotificationChoice === "email")
+      user = { email: email, phone_number: "", fln: flightNumber };
+    else
+      user = { email: "", phone_number: phoneNumber, fln: flightNumber };
 
     const response = await fetch(add_user_uri, {
       method: "POST",

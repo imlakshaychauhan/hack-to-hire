@@ -2,15 +2,18 @@ from flask import Flask, request, render_template, jsonify
 from flask_socketio import SocketIO
 from db import add_user_to_database
 from flask_cors import CORS
+from flask_apscheduler import APScheduler
+from utils import check_flight_updates
 
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
-
+scheduler = APScheduler()
+scheduler.init_app(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index`.html')
 
 
 @app.route('/add_user', methods=['POST'])
@@ -25,7 +28,7 @@ def add_user():
 
     response = add_user_to_database(fln, email, phone_number)
 
-    return jsonify({"message": "User added successfully", "id": str(response.inserted_id), "is_user_added": True}), 201
+    return jsonify({"message": "User added successfully", "id": str(response), "is_user_added": True}), 201
 
 
 @app.route('/get_flight_details/<flight_number>', methods=['GET'])
@@ -72,6 +75,9 @@ def get_details(flight_number):
     ]
     return jsonify(flight_data)
 
+
+scheduler.add_job(id='check_flights', func=check_flight_updates, trigger='interval', seconds=5)
+scheduler.start()
 
 if __name__ == '__main__':
     socketio.run(app, port=8000)
