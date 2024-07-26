@@ -8,23 +8,35 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {flight_details_uri, add_user_uri} from "../const";
+import { createClient } from 'pexels';
+import {pexels_api_key} from "../../credentials";
 
 const FlightDetails = () => {
+  const client = createClient(pexels_api_key);
   const { flightNumber } = useParams();
-  const [flightData, setFlightData] = useState(null);
+  const [flightData, setFlightData] = useState([]);
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [currentNotificationChoice, setCurrentNotificationChoice] =
     useState("email");
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState(false);
-
+  const [imgLink, setImgLink] = useState("");
   useEffect(() => {
     fetch(`${flight_details_uri}/${flightNumber}`)
-      .then((response) => response.json())
-      .then((data) => setFlightData(data))
-      .catch((error) => console.error("Error fetching flight data:", error));
+    .then((response) => response.json())
+    .then((data) => setFlightData(data))
+    .catch((error) => console.error("Error fetching flight data:", error));
+    
   }, [flightNumber]);
+
+  useEffect(() => {
+    if(flightData.length === 0)
+      return;
+    const query = flightData[0].airline_name;
+    client.photos.search({ query, per_page: 1 })
+    .then(photos => setImgLink(photos.photos[0].src.portrait))
+  }, [flightData]);
 
   const changeNotificationChoice = () => {
     if (currentNotificationChoice === "email") {
@@ -148,7 +160,7 @@ const FlightDetails = () => {
           <div className="flight-header">
             <div className="flight-header-left">
               <img
-                src={`https://www.logo-designer.co/storage/2018/02/2018-new-lufthansa-logo-design-airplane-livery-2.png`}
+                src={imgLink}
                 alt={airline_name}
                 className="airline-logo"
               />
