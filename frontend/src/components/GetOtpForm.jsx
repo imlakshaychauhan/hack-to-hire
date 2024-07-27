@@ -6,21 +6,23 @@ const GetOtpForm = ({getOtp, currentNotificationChoice, email, setEmail, phoneNu
         <form onSubmit={getOtp}>
               {currentNotificationChoice === "email" ? (
                 <div className="input-class">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="email">Email <span style={{ color: "red" }}>*</span></label>
                   <input
                     type="email"
                     id="email"
                     value={email}
+                    placeholder="Enter your Email Address"
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
               ) : (
                 <div className="input-class">
-                  <label htmlFor="phoneNumber">Phone Number</label>
+                  <label htmlFor="phoneNumber">Phone Number <span style={{ color: "red" }}>*</span></label>
                   <input
                     type="tel"
                     id="phoneNumber"
+                    placeholder="Enter your Phone Number"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required
