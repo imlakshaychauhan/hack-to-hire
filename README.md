@@ -55,12 +55,17 @@ The codebase includes error handling to manage invalid flight numbers and other 
     ```bash
     pip install -r requirements.txt
     ```
-4. **Run the Backend Server**: Start the Flask server.
+4. **credentials**: Update the data in credentials.py and credentials.js.
+5. **Run the Backend Server**: Start the Flask server.
     ```bash
     python app.py
     ```
+6. **Install Frontend Packages**: Install npm packages for React server.
+    ```bash
+    npm install -y
+    ```
 5. **Run the Frontend Server**: Start the React development server.
     ```bash
-    npm start
+    npm run dev
     ```
-6. **Access the Application**: Open the web application in your browser and use it to receive flight status notifications.
+6. **Access the Application on [http://localhost:5173](http://localhost:5173/)**: Open the web application in your browser and use it to receive flight status notifications.
