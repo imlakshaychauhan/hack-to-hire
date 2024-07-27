@@ -3,20 +3,25 @@ import smtplib
 from email.mime.text import MIMEText
 from twilio.rest import Client
 from credentials import x_rapidapi_host, x_rapidapi_key, account_sid, auth_token, twilio_phone_number, google_app_password, google_email
-
+from db import get_users_from_database, update_user_info_to_database
+from datetime import datetime
 
 def getFlightInfo(flight_number):
-    # flight_number = "LH767"
-    url = f'https://flightera-flight-data.p.rapidapi.com/flight/info?flnr={
-        flight_number}'
+    url = f'https://flightera-flight-data.p.rapidapi.com/flight/info?flnr={flight_number}'
     headers = {
         'x-rapidapi-host': x_rapidapi_host,
         'x-rapidapi-key': x_rapidapi_key
     }
 
-    response = requests.get(url, headers=headers)
-    response = response.json()
-    return response
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        flight_info = response.json()
+        if not flight_info:
+            raise ValueError(f"No flight information found for flight number: {flight_number}")
+        return flight_info
+    except Exception as err:
+        return {"error": f"An error occurred: {err}"}
 
 
 def send_email(to_email, subject, message):
@@ -36,7 +41,95 @@ def send_sms(to, body):
     message = client.messages.create(
         body=body,
         from_=twilio_phone_number,
-        to=to
+        to= "+91" + to
     )
 
     print(f"Message sent to {to}. SID: {message.sid}")
+    
+def calculate_delay(scheduled, actual):
+    scheduled_time = datetime.strptime(scheduled, '%Y-%m-%dT%H:%M:%S%z')
+    actual_time = datetime.strptime(actual, '%Y-%m-%dT%H:%M:%S%z')
+    delay_minutes = (actual_time - scheduled_time).total_seconds() / 60
+    return delay_minutes
+
+def check_flight_updates():
+    users = get_users_from_database()
+    for user in users:
+        fln = user['fln']
+        # flight_info = getFlightInfo(fln)
+        flight_info = [
+        {
+            "actual_arrival_is_estimated": "false",
+            "actual_arrival_local": "2024-07-25T06:21:09+02:00",
+            "actual_arrival_utc": "2024-07-25T04:21:09Z",
+            "actual_departure_is_estimated": "false",
+            "actual_departure_local": "2024-07-25T02:16:37+05:30",
+            "actual_departure_utc": "2024-07-24T20:46:37Z",
+            "airline_iata": "LH",
+            "airline_icao": "DLH",
+            "airline_name": "Lufthansa",
+            "arrival_city": "Munich",
+            "arrival_gate": "M28",
+            "arrival_iata": "MUC",
+            "arrival_icao": "EDDM",
+            "arrival_name": "Munich Airport",
+            "arrival_terminal": "2",
+            "codeshares": [
+                "AC9587",
+                "AI8763",
+                "SK3599"
+            ],
+            "date": "2024-07-25T00:00:00Z",
+            "departure_city": "Delhi",
+            "departure_gate": "015",
+            "departure_iata": "DEL",
+            "departure_icao": "VIDP",
+            "departure_name": "Delhi Indira Gandhi International Airport",
+            "departure_terminal": "3",
+            "family": "A380",
+            "flnr": "LH763",
+            "model": "A388",
+            "reg": "D-AIMM",
+            "scheduled_arrival_local": "2024-07-25T06:05:00+02:00",
+            "scheduled_arrival_utc": "2024-07-25T04:05:00Z",
+            "scheduled_departure_local": "2024-07-25T01:20:00+05:30",
+            "scheduled_departure_utc": "2024-07-24T19:50:00Z",
+            "status": "live"
+        }
+    ]
+        current_status = flight_info[0]["status"]
+        current_arrival_gate = flight_info[0]["arrival_gate"]
+        current_arrival_terminal = flight_info[0]["arrival_terminal"]
+        current_departure_gate = flight_info[0]["departure_gate"]
+        current_departure_terminal = flight_info[0]["departure_terminal"]
+        current_delay = calculate_delay(flight_info[0]["scheduled_arrival_local"], flight_info[0]["actual_arrival_local"])
+        
+        if(user["last_status"] == "none" and user["last_arrival_gate"] == "none" and user["last_arrival_terminal"] == "none" and user["last_departure_gate"] == "none" and user["last_departure_terminal"] == "none" and user["last_delay"] == "none"):
+            update_user_info_to_database(fln, current_status, current_arrival_gate, current_arrival_terminal, current_departure_gate, current_departure_terminal, current_delay)
+            return
+
+        if (user["last_status"] != current_status or
+            user["last_arrival_gate"] != current_arrival_gate or
+            user["last_arrival_terminal"] != current_arrival_terminal or
+            user["last_departure_gate"] != current_departure_gate or
+            user["last_departure_terminal"] != current_departure_terminal or
+            user["last_delay"] != current_delay):
+            message = f"Your flight {fln} has updates:\n"
+            if user["last_status"] != current_status:
+                message += f"Status changed to {current_status}.\n"
+            if user["last_arrival_gate"] != current_arrival_gate:
+                message += f"Arrival gate changed to {current_arrival_gate}.\n"
+            if user["last_arrival_terminal"] != current_arrival_terminal:
+                message += f"Arrival terminal changed to {current_arrival_terminal}.\n"
+            if user["last_departure_gate"] != current_departure_gate:
+                message += f"Departure gate changed to {current_departure_gate}.\n"
+            if user["last_departure_terminal"] != current_departure_terminal:
+                message += f"Departure terminal changed to {current_departure_terminal}.\n"
+            if user["last_delay"] != current_delay:
+                message += f"Delay is now {current_delay:.2f} minutes.\n"
+            if user["email"]:
+                send_email(user["email"], f"Flight {fln} Status Update", message)
+            if user["phone_number"]:
+                send_sms(user["phone_number"], message)
+
+            update_user_info_to_database(fln, current_status, current_arrival_gate, current_arrival_terminal, current_departure_gate, current_departure_terminal, current_delay)

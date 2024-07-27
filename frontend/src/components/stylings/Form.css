@@ -65,3 +65,38 @@
     align-items: start;
   }
   
+
+@media screen and (max-width: 805px) {
+  .form-container {
+    width: 80%;
+    height: 240px;
+    text-align: center;
+    margin-top: 30%;
+  }
+}
+@media screen and (max-width: 590px) {
+  input {
+    width: 300px;
+  }
+}
+
+@media screen and (max-width: 515px) {
+  .form-container {
+    width: 70%;
+    height: 290px;
+  }
+}
+
+@media screen and (max-width: 392px) {
+  .form-container {
+    height: 330px;
+  }
+}
+@media screen and (max-width: 350px) {
+  .form-container {
+    width: 60%;
+  }
+  input {
+    width: 250px;
+  }
+}
