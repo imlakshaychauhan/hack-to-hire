@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./stylings/FlightDetails.css";
 import "./stylings/Form.css";
-import airplaneIcon from "../assets/airplane-icon.png";
 import leftArrow from "../assets/left-arrow.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {flight_details_uri, add_user_uri} from "../const";
+import {flight_details_uri, add_user_uri, dummyData, get_otp_uri, verify_otp_uri} from "../const";
 import { createClient } from 'pexels';
 import {pexels_api_key} from "../../credentials";
+import GetNotifiedForm from "./GetNotifiedForm";
+import VerifyOtpForm from "./VerifyOtpForm";
+import GetOtpForm from "./GetOtpForm";
+import FlightInfo from "./FlightInfo";
 
 const FlightDetails = () => {
   const client = createClient(pexels_api_key);
@@ -22,14 +25,22 @@ const FlightDetails = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState(false);
   const [imgLink, setImgLink] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpFormStage, setOtpFormStage] = useState(1);
+  //* Steps for OTP Verification:
+  //* 1: Get OTP
+  //* 2: Verify OTP
+  //* 3: User Confirmation: Get Notified
+
+  // Getting flights data by fln
   useEffect(() => {
     fetch(`${flight_details_uri}/${flightNumber}`)
     .then((response) => response.json())
     .then((data) => setFlightData(data))
     .catch((error) => console.error("Error fetching flight data:", error));
-    
   }, [flightNumber]);
 
+  // Fetching logo for airlines
   useEffect(() => {
     if(flightData.length === 0)
       return;
@@ -38,6 +49,7 @@ const FlightDetails = () => {
     .then(photos => setImgLink(photos.photos[0].src.portrait))
   }, [flightData]);
 
+  // Changing the choice of registering contact for notifications
   const changeNotificationChoice = () => {
     if (currentNotificationChoice === "email") {
       setCurrentNotificationChoice("phone");
@@ -46,6 +58,7 @@ const FlightDetails = () => {
     }
   };
 
+  // Showing Loading GIF while flight data is being fetched
   if (!flightData || !flightData.length) {
     return (
       <div
@@ -67,48 +80,17 @@ const FlightDetails = () => {
     );
   }
 
-  const {
-    airline_name,
-    flnr,
-    status,
-    departure_city,
-    departure_name,
-    departure_terminal,
-    departure_gate,
-    scheduled_departure_local,
-    actual_departure_local,
-    arrival_city,
-    arrival_name,
-    arrival_terminal,
-    arrival_gate,
-    scheduled_arrival_local,
-    actual_arrival_local,
-  } = flightData[0];
+  // Extracing important flight info
+  const { airline_name, flnr, status } = flightData[0];
 
-  const formatTime = (time) => new Date(time).toLocaleString();
-
-  const getDelay = (scheduled, actual) => {
-    const scheduledTime = new Date(scheduled);
-    const actualTime = new Date(actual);
-    const delay = (actualTime - scheduledTime) / (1000 * 60);
-    const hours = Math.floor(delay / 60);
-    const minutes = (delay % 60).toFixed(2);
-    return `${hours ? `${hours} hour ` : ""}${minutes} minutes`;
-  };
-
-  const departureDelay = getDelay(
-    scheduled_departure_local,
-    actual_departure_local
-  );
-  const arrivalDelay = getDelay(scheduled_arrival_local, actual_arrival_local);
-
+  // User is verified and can be added to database for notifications (or alerts)
   const addUserToDb = async (e) => {
     e.preventDefault();
     let user = {}
     if(currentNotificationChoice === "email")
-      user = { email: email, phone_number: "", fln: flightNumber };
+      user = { email: email.toLowerCase(), phone_number: "", fln: flightNumber.toUpperCase() };
     else
-      user = { email: "", phone_number: phoneNumber, fln: flightNumber };
+      user = { email: "", phone_number: phoneNumber, fln: flightNumber.toUpperCase() };
 
     const response = await fetch(add_user_uri, {
       method: "POST",
@@ -142,136 +124,121 @@ const FlightDetails = () => {
     }
   };
 
+  // Getting OTP to the given contact by user
+  const getOtp = async (e) => {
+    e.preventDefault();
+    let uri_suffix = "";
+  
+    if (currentNotificationChoice === "email")
+      uri_suffix = `/${flightNumber}/email/${email}`;
+    else
+      uri_suffix = `/${flightNumber}/phoneNumber/${phoneNumber}`;
+  
+    const url = get_otp_uri + uri_suffix;
+  
+    const response = await fetch(url, {
+      method: "GET",
+    });
+    
+    // const data = await response.json();
+    if (response.ok) {
+      toast.success(`OTP sent to your ${currentNotificationChoice}!`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+        transition: Flip,
+      });
+      setOtpFormStage(2);
+    } else {
+      toast.error("Error sending OTP, please try again.", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+        transition: Flip,
+      });
+    }
+  };
+
+  // Verifying OTP to the given OTP by user
+  const verifyOtp = async (e) => {
+    e.preventDefault();
+  
+    const uri_suffix = `/${otp}/${currentNotificationChoice === "email" ? email : phoneNumber}`;
+    const url = verify_otp_uri + uri_suffix;
+  
+    const response = await fetch(url, {
+      method: "GET",
+    });
+  
+    // const data = await response.json();
+    if (response.ok) {
+      toast.success("OTP verified successfully!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+        transition: Flip,
+      });
+      setOtpFormStage(3);
+    } else {
+      toast.error("Invalid OTP, please try again.", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+        transition: Flip,
+      });
+    }
+    setOtp("");
+  };
+  
   return (
     <div>
       <ToastContainer />
-      <button
-        className="back-btn"
-        onClick={() => navigate("/", { replace: true })}
-      >
-        {" "}
+      <button className="back-btn" onClick={() => navigate("/", { replace: true })}>
         <div className="back-btn-div">
-          {" "}
-          <img src={leftArrow} width={20} height={18} /> Back{" "}
+          <img src={leftArrow} width={20} height={18} /> Back
         </div>
       </button>
       <div className="flight-details-container">
-        <div className="flight-info">
-          <div className="flight-header">
-            <div className="flight-header-left">
-              <img
-                src={imgLink}
-                alt={airline_name}
-                className="airline-logo"
-              />
-              <h2>
-                {airline_name} {flnr}
-              </h2>
-            </div>
-            <span className={`status ${status.toLowerCase()}`}>
-              {status.toUpperCase()}
-            </span>
-          </div>
-          <div className="flight-details">
-            <div className="flight-route">
-              <div className="airport-code">{departure_city}</div>
-              <div className="flight-icon">
-                <img src={airplaneIcon} width={30} height={30} />
-              </div>
-              <div className="airport-code">{arrival_city}</div>
-            </div>
-            <div className="airport-details">
-              <div className="departure">
-                <h3>Departure</h3>
-                <p>
-                  {departure_city}, {departure_name}
-                </p>
-                <p>
-                  <b>Terminal:</b> {departure_terminal}, Gate: {departure_gate}
-                </p>
-                <p>
-                  <b>Scheduled:</b> {formatTime(scheduled_departure_local)}
-                </p>
-                <p>
-                  <b>Actual:</b> {formatTime(actual_departure_local)}
-                </p>
-                <p>
-                  <b>Delay:</b> {departureDelay}
-                </p>
-              </div>
-              <div className="arrival">
-                <h3>Arrival</h3>
-                <p>
-                  {arrival_city}, {arrival_name}
-                </p>
-                <p>
-                  <b>Terminal:</b> {arrival_terminal}, Gate: {arrival_gate}
-                </p>
-                <p>
-                  <b>Scheduled:</b> {formatTime(scheduled_arrival_local)}
-                </p>
-                <p>
-                  <b>Actual:</b> {formatTime(actual_arrival_local)}
-                </p>
-                <p>
-                  <b>Delay:</b> {arrivalDelay}
-                </p>
-              </div>
-            </div>
-          </div>
+
+        <FlightInfo flightData={flightData} imgLink={imgLink} />
+
+        {status !== "landed" && (
+        <div className="notification-form">
+          <div className="h-line"></div>
+          <h2>Get Notified for {airline_name} {flnr}</h2>
+
+          {/* Show otp form on 1st stage */}
+          {otpFormStage === 1 && <GetOtpForm getOtp={getOtp} currentNotificationChoice={currentNotificationChoice} email={email} setEmail={setEmail} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} changeNotificationChoice={changeNotificationChoice} />}
+
+          {/* Verify otp form on 2st stage */}
+          {otpFormStage === 2 && <VerifyOtpForm verifyOtp={verifyOtp} otp={otp} setOtp={setOtp} contactType={currentNotificationChoice} />}
+
+          {/* User confirmation form on 3rd stage */}
+          {otpFormStage === 3 && <GetNotifiedForm addUserToDb={addUserToDb} />}
+          {errorMessage && (
+            <p style={{ color: "red", fontWeight: "bold" }}>
+              There is something wrong with your {currentNotificationChoice === "email" ? "Email" : "Phone Number"}, please try it again!
+            </p>
+          )}
         </div>
-        {status !== "landed" ? (
-          <div className="notification-form">
-            <div className="h-line"></div>
-            <h2>
-              Get Notified for {airline_name} {flnr}
-            </h2>
-            <form onSubmit={addUserToDb}>
-              {currentNotificationChoice === "email" ? (
-                <div className="input-class">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              ) : (
-                <div className="input-class">
-                  <label htmlFor="phoneNumber">Phone Number</label>
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-              <button className="submit-btn" type="submit">
-                Get Notified
-              </button>
-            </form>
-            <button onClick={changeNotificationChoice}>
-              Use{" "}
-              {currentNotificationChoice === "email" ? "Phone Number" : "Email"}{" "}
-              Instead
-            </button>
-            {errorMessage && (
-              <p style={{ color: "red", fontWeight: "bold" }}>
-                There is something wrong with your{" "}
-                {currentNotificationChoice === "email"
-                  ? "Email"
-                  : "Phone Number"}
-                , please try it again!
-              </p>
-            )}
-          </div>
-        ) : (
-          <></>
-        )}
+      )}
+
       </div>
     </div>
   );

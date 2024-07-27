@@ -8,6 +8,8 @@ export const backgroundImages = [
 
 export const flight_details_uri = "http://127.0.0.1:8000/get_flight_details";
 export const add_user_uri = "http://127.0.0.1:8000/add_user";
+export const get_otp_uri = "http://127.0.0.1:8000/generate-otp";
+export const verify_otp_uri = "http://127.0.0.1:8000/verify-otp";
 
 
 export const dummyData = [

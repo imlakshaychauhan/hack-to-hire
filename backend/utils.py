@@ -7,17 +7,21 @@ from db import get_users_from_database, update_user_info_to_database
 from datetime import datetime
 
 def getFlightInfo(flight_number):
-    # flight_number = "LH767"
-    url = f'https://flightera-flight-data.p.rapidapi.com/flight/info?flnr={
-        flight_number}'
+    url = f'https://flightera-flight-data.p.rapidapi.com/flight/info?flnr={flight_number}'
     headers = {
         'x-rapidapi-host': x_rapidapi_host,
         'x-rapidapi-key': x_rapidapi_key
     }
 
-    response = requests.get(url, headers=headers)
-    response = response.json()
-    return response
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        flight_info = response.json()
+        if not flight_info:
+            raise ValueError(f"No flight information found for flight number: {flight_number}")
+        return flight_info
+    except Exception as err:
+        return {"error": f"An error occurred: {err}"}
 
 
 def send_email(to_email, subject, message):

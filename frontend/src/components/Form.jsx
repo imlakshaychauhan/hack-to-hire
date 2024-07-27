@@ -9,7 +9,7 @@ const Form = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate(`/flight-details/${flightNumber}`, { replace: true });
+    navigate(`/flight-details/${flightNumber.toUpperCase()}`, { replace: true });
   };
 
   return (
@@ -18,13 +18,14 @@ const Form = () => {
     <p>By IndiGo</p>
       <form onSubmit={handleSubmit}>
         <div className='input-class'>
-          <label htmlFor="flightNumber">Flight Number <u> (mandatory)</u></label>
+          <label htmlFor="flightNumber">Flight Number <span style={{ color: "red" }}>*</span></label>
           <input
             type="text"
             id="flightNumber"
             value={flightNumber}
             onChange={(e) => setFlightNumber(e.target.value)}
             required
+            placeholder="Enter your flight number (FLN)"
           />
         </div>
 
