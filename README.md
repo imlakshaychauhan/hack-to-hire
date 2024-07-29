@@ -1,9 +1,8 @@
 # <p align="center">FlightTrack: Flight Status and Notifications System ✈️<p>
-   <p align="center">
-      <img src="https://github.com/user-attachments/assets/089a69c5-3705-4b4e-95e0-14e88e9e9bf9" alt="Home Page" />
-   </p>
-   <p align="center"><strong>Home Page</strong></p>
-   
+
+## Presentation
+<h3 align="center"> <strong> Check out the detailed presentation of this project <a href="https://github.com/imlakshaychauhan/hack-to-hire/blob/main/hack-to-hire-ppt.pptx">here</a> or <a href="https://drive.google.com/file/d/1rvJSmsVc6rUAk6vdAlRBH4RI7tyy-qMx/view?usp=sharing">on Google Drive</a>. </strong> </h3>
+
 ## Project Summary
 
 This project aims to provide real-time flight status updates and notifications to passengers. The system displays current flight status (delays, cancellations, gate changes) and sends notifications for flight status changes via SMS and email.
