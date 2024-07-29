@@ -1,4 +1,4 @@
-# <p align="center">FlightTrack: Flight Status and Notifications System<p>
+# <p align="center">FlightTrack: Flight Status and Notifications System ✈️<p>
    <p align="center">
       <img src="https://github.com/user-attachments/assets/089a69c5-3705-4b4e-95e0-14e88e9e9bf9" alt="Home Page" />
    </p>
