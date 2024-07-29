@@ -35,3 +35,6 @@ def update_user_info_to_database(fln, new_status, new_arrival_gate, new_arrival_
             "last_delay": new_delay
         }}
     )
+
+def check_contact_in_db(flight_number, contact):
+    return collection.find_one({"fln": flight_number, "$or": [{"email": contact}, {"phone_number": contact}]}) is not None

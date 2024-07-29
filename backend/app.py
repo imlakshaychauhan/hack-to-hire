@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, jsonify
-from db import add_user_to_database
+from db import add_user_to_database, check_contact_in_db
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
 from utils import check_flight_updates, send_sms, send_email, getFlightInfo
@@ -33,6 +33,9 @@ def add_user():
 
 @app.route("/generate-otp/<flight_number>/<contact_type>/<contact>", methods=['GET'])
 def generate_otp_for_verification(flight_number, contact_type, contact):
+    if check_contact_in_db(flight_number, contact):
+        return jsonify({"error": f"{contact_type} is already registered for flight number {flight_number}."}), 400
+
     otp = random.randint(1000, 9999)
     body = f"Your OTP for FlightTrack is {otp}\nYou will be notified for the flight: {flight_number}.\nPlease DO NOT share this OTP with anyone."
 
@@ -46,7 +49,7 @@ def generate_otp_for_verification(flight_number, contact_type, contact):
 
     otp_storage[contact] = otp
 
-    return jsonify({"confirmation_message": f"OTP is succesfully generated to your {contact_type}: {contact}"}), 200
+    return jsonify({"confirmation_message": f"OTP is successfully generated to your {contact_type}: {contact}"}), 200
 
 
 @app.route("/verify-otp/<otp>/<contact>", methods=["GET"])
@@ -70,49 +73,10 @@ def verify_otp(otp, contact):
 
 @app.route('/get_flight_details/<flight_number>', methods=['GET'])
 def get_details(flight_number):
-    flight_data = [
-        {
-            "actual_arrival_is_estimated": "false",
-            "actual_arrival_local": "2024-07-25T06:21:09+02:00",
-            "actual_arrival_utc": "2024-07-25T04:21:09Z",
-            "actual_departure_is_estimated": "false",
-            "actual_departure_local": "2024-07-25T02:16:37+05:30",
-            "actual_departure_utc": "2024-07-24T20:46:37Z",
-            "airline_iata": "LH",
-            "airline_icao": "DLH",
-            "airline_name": "Lufthansa",
-            "arrival_city": "Munich",
-            "arrival_gate": "M28",
-            "arrival_iata": "MUC",
-            "arrival_icao": "EDDM",
-            "arrival_name": "Munich Airport",
-            "arrival_terminal": "2",
-            "codeshares": [
-                "AC9587",
-                "AI8763",
-                "SK3599"
-            ],
-            "date": "2024-07-25T00:00:00Z",
-            "departure_city": "Delhi",
-            "departure_gate": "015",
-            "departure_iata": "DEL",
-            "departure_icao": "VIDP",
-            "departure_name": "Delhi Indira Gandhi International Airport",
-            "departure_terminal": "3",
-            "family": "A380",
-            "flnr": "LH763",
-            "model": "A388",
-            "reg": "D-AIMM",
-            "scheduled_arrival_local": "2024-07-25T06:05:00+02:00",
-            "scheduled_arrival_utc": "2024-07-25T04:05:00Z",
-            "scheduled_departure_local": "2024-07-25T01:20:00+05:30",
-            "scheduled_departure_utc": "2024-07-24T19:50:00Z",
-            "status": "live"
-        }
-    ]
-
-    # response = getFlightInfo(flight_number)
-    # flight_data = response.json()
+    
+    response = getFlightInfo(flight_number)
+    flight_data = response.json()
+    
     return jsonify(flight_data)
 
 
@@ -120,4 +84,4 @@ scheduler.add_job(id='check_flights', func=check_flight_updates, trigger='interv
 scheduler.start()
 
 if __name__ == '__main__':
-    app.run(app, port=8000)
+    app.run(port=8000)
