@@ -1,7 +1,7 @@
 # <p align="center">FlightTrack: Flight Status and Notifications System ✈️<p>
 
 ## Presentation
-<h3 align="center"> <strong> Check out the detailed presentation of this project <a href="https://github.com/imlakshaychauhan/hack-to-hire/blob/main/hack-to-hire-ppt.pptx" target="_blank">here</a> or <a href="https://drive.google.com/file/d/1rvJSmsVc6rUAk6vdAlRBH4RI7tyy-qMx/view?usp=sharing" target="_blank">on Google Drive</a>. </strong> </h3>
+<h3 align="center"> <strong> Check out the detailed presentation of this project <a href="https://github.com/imlakshaychauhan/hack-to-hire/blob/main/hack-to-hire-ppt.pptx" target="_blank">here</a> or <a href="https://drive.google.com/file/d/1rvJSmsVc6rUAk6vdAlRBH4RI7tyy-qMx/view?usp=sharing" target="blank">on Google Drive</a>. </strong> </h3>
 
 ## Project Summary
 
