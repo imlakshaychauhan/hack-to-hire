@@ -75,9 +75,7 @@ def verify_otp(otp, contact):
 def get_details(flight_number):
     
     response = getFlightInfo(flight_number)
-    flight_data = response.json()
-    
-    return jsonify(flight_data)
+    return jsonify(response)
 
 
 scheduler.add_job(id='check_flights', func=check_flight_updates, trigger='interval', seconds=600)

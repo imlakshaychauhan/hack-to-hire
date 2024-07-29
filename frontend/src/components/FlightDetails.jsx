@@ -35,11 +35,26 @@ const FlightDetails = () => {
   // Getting flights data by fln
   useEffect(() => {
     fetch(`${flight_details_uri}/${flightNumber}`)
-    .then((response) => response.json())
-    .then((data) => setFlightData(data))
-    .catch((error) => console.error("Error fetching flight data:", error));
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.error) {
+          setFlightData(data);
+        } else {
+          navigate("/", {
+            replace: true,
+            state: { errorMessage: `No flight information found for flight number ${flightNumber}.` }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching flight data:", error);
+        navigate("/", {
+          replace: true,
+          state: { errorMessage: "Error fetching flight data. Please try again." }
+        });
+      });
   }, [flightNumber]);
-
+  
   // Fetching logo for airlines
   useEffect(() => {
     if(flightData.length === 0)

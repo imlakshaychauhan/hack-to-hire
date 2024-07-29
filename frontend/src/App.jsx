@@ -1,29 +1,19 @@
 import { useEffect, useState } from 'react';
 import {
-  createBrowserRouter,
-  RouterProvider,
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { backgroundImages } from "./const";
 import './App.css';
 import Form from './components/Form';
 import FlightDetails from './components/FlightDetails';
+import { ToastContainer, toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Form />,
-  },
-  {
-    path: "/flight-details/:flightNumber",
-    element: <FlightDetails />
-  },
-  {
-    path: "*",
-    element: <Form />
-  }
-]);
-
-function App() {
+const App = () => {
   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
@@ -35,16 +25,47 @@ function App() {
   }, []);
 
   return (
-      <div className="App">
-        <div
-          className="background"
-          style={{ backgroundImage: `url(${backgroundImages[currentImage]})` }}
-        />
-        <div className="overlay">
-          <RouterProvider router={router} />
-        </div>
+    <div className="App">
+      <div
+        className="background"
+        style={{ backgroundImage: `url(${backgroundImages[currentImage]})` }}
+      />
+      <div className="overlay">
+        <Router>
+          <ToastContainer />
+          <Routes>
+            <Route path="/" element={<Form />} />
+            <Route path="/flight-details/:flightNumber" element={<FlightDetails />} />
+            <Route path="*" element={<Form />} />
+          </Routes>
+          <LocationBasedToast />
+        </Router>
       </div>
+    </div>
   );
 }
+
+const LocationBasedToast = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state && location.state.errorMessage) {
+      toast.error(location.state.errorMessage, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+        transition: Flip,
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location]);
+
+  return null;
+};
 
 export default App;
