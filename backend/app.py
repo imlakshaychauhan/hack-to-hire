@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template, jsonify
-from flask_socketio import SocketIO
 from db import add_user_to_database
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
@@ -9,7 +8,6 @@ from const import otp_storage
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
 scheduler = APScheduler()
 scheduler.init_app(app)
 
@@ -122,4 +120,4 @@ scheduler.add_job(id='check_flights', func=check_flight_updates, trigger='interv
 scheduler.start()
 
 if __name__ == '__main__':
-    socketio.run(app, port=8000)
+    app.run(app, port=8000)

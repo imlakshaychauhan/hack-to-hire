@@ -1,1 +1,1 @@
-export const pexels_api_key = ""
+export const pexels_api_key = "";
