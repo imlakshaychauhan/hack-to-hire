@@ -80,10 +80,15 @@ The codebase includes error handling to manage invalid flight numbers and other 
 5. **OTP Sent to Email/Phone**
    <p align="center">
       <img src="https://github.com/user-attachments/assets/5876db0d-5733-47dc-baad-d23bae156f3d" alt="OTP Sent" />
-      <img src="https://github.com/user-attachments/assets/0d8de760-2c6e-49c9-a846-70cc158b1889" alt="OTP Screenshot" />
    </p>
    <p align="center"><strong>OTP Sent to Email/Phone</strong></p>
 
+6. **OTP Screenshot**
+   <p align="center">
+      <img src="https://github.com/user-attachments/assets/0d8de760-2c6e-49c9-a846-70cc158b1889" alt="OTP Screenshot" />
+   </p>
+   <p align="center"><strong>OTP Screenshot on Email/Phone</strong></p>
+   
 7. **Filling OTP for Verification**
    <p align="center">
       <img src="https://github.com/user-attachments/assets/90ac8859-79d2-4c47-8c14-fa2e0a2683ae" alt="OTP Verification" />
