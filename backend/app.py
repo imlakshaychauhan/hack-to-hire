@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, jsonify
+from backend.flights_db import get_flights_from_database
 from db import add_user_to_database, check_contact_in_db
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
@@ -51,6 +52,11 @@ def generate_otp_for_verification(flight_number, contact_type, contact):
     otp_storage[contact] = otp
 
     return jsonify({"confirmation_message": f"OTP is successfully generated to your {contact_type}: {contact}"}), 200
+
+@app.route("/get-flights/<flight_number>/<arrival_city>/<departure_city>", methods=['GET'])
+def generate_otp_for_verification(flight_number, arrival_city, departure_city):
+    response = get_flights_from_database(flight_number, arrival_city, departure_city)
+    return jsonify(response)
 
 
 @app.route("/verify-otp/<otp>/<contact>", methods=["GET"])
