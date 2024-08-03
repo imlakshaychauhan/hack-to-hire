@@ -5,7 +5,7 @@ account_sid = ''
 auth_token = ''
 twilio_phone_number = ''
 
-mongodb_uri = ""
+mongodb_uri = "mongodb+srv://hack-to-hire:hack-to-hire@maincluster.vaweana.mongodb.net/?retryWrites=true&w=majority&appName=MainCluster"
 
 google_app_password = ""
 google_email = ""
