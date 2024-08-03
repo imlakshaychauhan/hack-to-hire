@@ -7,5 +7,5 @@ twilio_phone_number = ''
 
 mongodb_uri = "mongodb+srv://hack-to-hire:hack-to-hire@maincluster.vaweana.mongodb.net/?retryWrites=true&w=majority&appName=MainCluster"
 
-google_app_password = ""
-google_email = ""
+google_app_password = "glpf ftbx uxki ktzj"
+google_email = "chauhanhoney2001@gmail.com"
