@@ -5,6 +5,7 @@ from flask_apscheduler import APScheduler
 from utils import check_flight_updates, send_sms, send_email, getFlightInfo
 import random
 from const import otp_storage
+from const import dummyData
 
 app = Flask(__name__)
 CORS(app)
@@ -74,7 +75,8 @@ def verify_otp(otp, contact):
 @app.route('/get_flight_details/<flight_number>', methods=['GET'])
 def get_details(flight_number):
     
-    response = getFlightInfo(flight_number)
+    # response = getFlightInfo(flight_number)
+    response = dummyData
     return jsonify(response)
 
 
