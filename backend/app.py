@@ -75,8 +75,7 @@ def verify_otp(otp, contact):
 @app.route('/get_flight_details/<flight_number>', methods=['GET'])
 def get_details(flight_number):
     
-    # response = getFlightInfo(flight_number)
-    response = dummyData
+    response = getFlightInfo(flight_number)
     return jsonify(response)
 
 

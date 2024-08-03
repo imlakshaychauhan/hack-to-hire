@@ -5,8 +5,10 @@ from twilio.rest import Client
 from credentials import x_rapidapi_host, x_rapidapi_key, account_sid, auth_token, twilio_phone_number, google_app_password, google_email
 from db import get_users_from_database, update_user_info_to_database
 from datetime import datetime
+from const import dummyData
 
 def getFlightInfo(flight_number):
+    return dummyData
     url = f'https://flightera-flight-data.p.rapidapi.com/flight/info?flnr={flight_number}'
     headers = {
         'x-rapidapi-host': x_rapidapi_host,
